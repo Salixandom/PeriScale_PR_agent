@@ -1,0 +1,149 @@
+ok let me review and correct me if I am wrong on how the agent works
+
+
+the user will give a query
+
+the agent will do a sanity check through system prompt guard, irrelevant prompt, data privacy
+
+then it checks if the query was done before or not
+
+I mean have a history meaning the result is in database or cache or not
+
+if yes then give the result and if not then go forward through director
+
+then it will go to query clearity analyzer and check if the query is clear or not
+
+Or do the agent need to ask the user for more information
+
+if yes then ask and if not then proceed
+
+the agent is now in director
+
+the director has to decide the agent calling flow
+
+It has the other agents under him
+
+he decides a flow
+
+the agent runs one by one and send the output back to the director and the director calls the second agent and so on
+
+after completing its flow the quality checker decides should it run some extra agents twice or more 
+
+if so then director runs them also for better result
+
+then it sends the output to review synthesizer
+
+If the review synthesizer decides that it should take human review 
+
+then it send the output to human and ask for a review that should it take it as answer or should it paraphase it
+
+if user says yes to paraphasing then the review synthesizer does that and sends the better result to the user and stores it in the cache for future purpose
+
+
+
+ok here comes the agent pool description
+
+there are some agents which are groups and should be run in parallel
+
+and some agents who will run in synchronus 
+
+the query parser parses the query more for better searching and others for the upcoming agents
+
+the group 1 market research uses the webscrapper, web search and api calls to get as much information about the product he can. These will be specific to normal website based
+
+the trend analysis will only handle the google trend api call to collect the trend for that product search and others
+
+If there are other trend operating api or sites then it will handle them also
+
+the social media intel will search the meta add library api call and web scrap reddit, X and other social media sites to gather ad information or trend for that product
+
+as these are just information collecting they are run in a parallel group
+
+
+the group 2
+
+seasonal analysis will use the information about the trend information to build a month map about which month or season is best for launching that product
+
+Historical database will have info about the success and other important research information that were stored while serving past queries and use them for this result building
+
+Competitive analysis will use the information from the market research and ad so that it can merge a result about the competitors about this product
+
+
+group 3
+
+the country analyzer can use the information from the ad library and market research to get a result about which country is best for this product
+
+Which country demands more
+
+Logistics and shipping
+
+this will also collect information through some api and web scrapper to get how much money it cost for logistics from the users current location to gather a cost analysis
+
+Supplier sourcing
+
+this will use the information about whole seller or market research or can do web search of its own so that a user can know from which supplier it can use for better profit
+
+
+group 4
+
+pricing strategy
+
+the agent can use the information from logistic and supplier and seasonal analysis to build a pricing strategy
+
+marketing strategy
+
+the agent can use the information from competitive analysis, seasonal analysis and historical database for marketing strategy
+
+Social media promotion guide
+
+the agent can use the ad library information to make this guide
+
+business launch guide
+
+I guess we can put this out of this group as it can use the information from marketing strategy, financial modeling, social media promotion guide and pricing strategy to build the business launch guide. it can also use the info from competitive analysis and historical database
+
+
+financial modeling
+
+I guess we can set it as a single agent also
+
+Not in a parallel execution group as it can use information from pricing strategy, trend analysis and historical database
+
+
+sentiment analysis
+
+the agent uses the competitor details parsed so far and the reviews from there to use that to merge a information about what the customers don't like and do likes
+
+we can use this information in other agents also
+
+Like marketing strategy, business launch guide
+
+
+Risk assestment
+
+the agent uses the trend analysis, financial modeling and seasonal model analysis and the information from historical database to set up the risk assestment
+
+
+timing optimization
+
+The agent uses the trend analysis, seasonal model analysis and historical database for timing optimization
+
+
+
+and lastly the review synthesizer can store these important information in the chromadb for historical database while saving the query and ouptut in the chromadb also
+
+I will be using a single database which will be chromadb
+
+
+is all this right?
+
+read carefully
+
+give feedback
+
+
+Updates:
+Country Analyzer: Moved from Group 3 to Group 2 (Analysis). You must know where you are selling before you check shipping costs.
+Sentiment Analysis: Moved to Group 2. Marketing (Group 4) needs to know customer sentiment before it creates a strategy.
+Financial Modeling: Confirmed as a standalone step after Pricing.
+Business Launch Guide: Confirmed as the final aggregator.
