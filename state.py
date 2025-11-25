@@ -12,7 +12,6 @@ class QueryIntent(str, Enum):
     FINANCIAL_ANALYSIS = "financial_analysis"
     MARKETING_STRATEGY = "marketing_strategy"
     LAUNCH_PLANNING = "launch_planning"
-    
 
 class Currency(str, Enum):
     USD = "USD"
@@ -23,7 +22,13 @@ class Currency(str, Enum):
     INR = "INR"
     JPY = "JPY"
     
-
+class TrendDirection(str, Enum):
+    RISING = "rising"
+    FALLING = "falling"
+    STABLE = "stable"
+    SEASONAL = "seasonal"
+    
+    
 class ParsedQuery(BaseModel):
     """Information extracted from the user input/query"""
     query_intent: QueryIntent = Field(description="The main goal of the user")
@@ -57,6 +62,27 @@ class MarketResearchData(BaseModel):
     market_size: Optional[float] = Field(description="Market size")
     market_summary: str = Field(description="Brief summary of the search results")
     
+
+class TrendMetrics(BaseModel):
+    """Single data point in the time series"""
+    date: datetime = Field(description="Date of data point")
+    interest_value: int = Field(ge=0, le=100, description="Interest 0-100")
+
+class KeywordTrendAnalysis(BaseModel):
+    """Analysis for a SINGLE keyword"""
+    keyword: str = Field(description="Keyword")
+    trend_direction: TrendDirection = Field(description="Trend direction (rising, falling, stable, seasonal)")
+    average_interest: float = Field(description="Average interest over the last 12 months")
+    peak_month: str = Field(description="Month with typically highest interest")
+    interest_over_time: List[TrendMetrics] = Field(description="Weekly data points over 3 years")
+
+class TrendAnalysisData(BaseModel):
+    """Aggregated Output for ALL keywords"""
+    target_country_iso: str = Field(description="Target Region Code (e.g. FR)")
+    timeframe: str = Field(description="Date range used")
+    keyword_trends: List[KeywordTrendAnalysis] = Field(description="List of analysis per keyword")
+    overall_market_direction: TrendDirection = Field(description="Overall market direction")
+    top_related_queries: List[str] = Field(description="Top 5 related rising search items")
     
 class AgentState(BaseModel):
     """Shared memory for the system"""
@@ -68,6 +94,9 @@ class AgentState(BaseModel):
     
     # AGENT -> MarketResearchData
     market_research_data: Optional[MarketResearchData] = None
+    
+    # AGENT -> TrendAnalysisData
+    trend_analysis_data: Optional[TrendAnalysisData] = None
     
     # System Info
     error_message: Optional[Dict[str, str]] = None
