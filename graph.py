@@ -46,7 +46,8 @@ def human_node_planner(state: AgentState):
                 f"\n  {step.step_number}. {step.agent_name.value}\n"
                 f"  📝 Instruction: {step.instruction}\n"
                 f"  💡 Reasoning:   {step.reasoning}\n"
-            )
+            )    
+        print(f"\n Summary: {state.plan.summary}")
 
     
     user_response = input("\n> Do you approve this plan? (yes/feedback): ").strip()

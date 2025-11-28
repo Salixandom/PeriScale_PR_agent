@@ -47,6 +47,11 @@ class ExecutionPlan(BaseModel):
     goal: str
     steps: List[PlanStep] = Field(description="Steps to achieve the goal")
     final_objective: str = Field(description="Final objective of the plan")
+    summary: str = Field(description="""Give a detailed overview of the steps.
+                            Tell it like you are talking to yourself of what you have to do. 
+                            Why you need them and how will they work in which order and what problem they will solve. 
+                            Give detailed plan for human understanding
+                            Give the result in Markdown format""")
     
 
 class CritiqueOutput(BaseModel):
