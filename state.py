@@ -28,6 +28,31 @@ class TrendDirection(str, Enum):
     STABLE = "stable"
     SEASONAL = "seasonal"
     
+class AgentName(str, Enum):
+    QUERY_PARSER = "query_parser"
+    MARKET_RESEARCHER = "market_researcher"
+    TREND_ANALYSIS = "trend_analysis"
+    SUPPLIER_SOURCING = "supplier_sourcing"
+    FINANCIAL_MODELING = "financial_modeling"
+    
+class PlanStep(BaseModel):
+    step_number: int = Field(description="Step number of the plan")
+    agent_name: AgentName = Field(description="Name of the agent")
+    instruction: str = Field(description="Specific goal for this step")
+    reasoning: str = Field(description="Why this step is needed")
+    status: str = Field(default="pending")
+    
+    
+class ExecutionPlan(BaseModel):
+    goal: str
+    steps: List[PlanStep] = Field(description="Steps to achieve the goal")
+    final_objective: str = Field(description="Final objective of the plan")
+    
+
+class CritiqueOutput(BaseModel):
+    is_approved: bool = Field(description="True if the plan is approved by the critic")
+    feedback: str = Field(description="Specific instructions on what to fix")
+    
     
 class ParsedQuery(BaseModel):
     """Information extracted from the user input/query"""
@@ -88,6 +113,12 @@ class AgentState(BaseModel):
     """Shared memory for the system"""
     # INPUT
     user_raw_query: str
+    
+    # PLANNING STEP
+    plan: Optional[ExecutionPlan] = None
+    plan_feedback: List[str] = Field(default_factory=list)
+    planner_loop_count: int = Field(default=0)
+    is_plan_approved: bool = Field(default=False)
     
     # AGENT -> ParsedQuery
     parsed_query: Optional[ParsedQuery] = None

@@ -2,7 +2,7 @@ import os
 from state import AgentState
 from agents.QueryParser import run_query_parser
 from agents.MarketResearcher import run_market_research
-from agents.TrendAnalysis_pytrends import run_trend_analysis
+from agents.TrendAnalysis import run_trend_analysis
 
 
 def main():

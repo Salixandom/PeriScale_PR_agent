@@ -28,7 +28,7 @@ def fetch_webshare_proxies():
     Fetches the live list of proxies from Webshare API.
     Returns a list of formatted strings: 'http://user:pass@ip:port'
     """
-    api_token = os.getenv("WEBSHARE_API_TOKEN")
+    api_token = os.getenv("WEBSHARE_API_KEY")
     if not api_token:
         print("   ⚠️ No WEBSHARE_API_TOKEN found. Skipping API fetch.")
         return []
