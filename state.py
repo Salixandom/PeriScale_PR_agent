@@ -114,6 +114,35 @@ class TrendAnalysisData(BaseModel):
     overall_market_direction: TrendDirection = Field(description="Overall market direction")
     top_related_queries: List[str] = Field(description="Top 5 related rising search items")
     
+class SupplierData(BaseModel):
+    supplier_name: str = Field(description="Name of the supplier")
+    platform: str = Field(description="Platform (Alibaba, AliExpress, etc.)")
+    product_url: str = Field(description="Link to the product")
+    price_per_unit: float = Field(description="Estimated cost per unit")
+    moq: int = Field(default=1, description="Minimum Order Quantity")
+    rating: Optional[float] = Field(default=None, description="Supplier rating")
+    delivery_time_days: Optional[str] = Field(default=None, description="Estimated shipping time")
+
+class SupplierSourcingData(BaseModel):
+    suppliers: List[SupplierData] = Field(description="List of potential suppliers")
+    average_unit_cost: float = Field(description="Average cost per unit")
+    recommended_supplier: Optional[SupplierData] = Field(default=None, description="Best supplier")
+
+class FinancialMetrics(BaseModel):
+    gross_profit_per_unit: float = Field(description="Selling Price - (Product Cost + Shipping)")
+    net_profit_per_unit: float = Field(description="Gross Profit - Ad/Marketing Costs")
+    margin_percentage: float = Field(description="Net Profit / Selling Price * 100")
+    break_even_units: int = Field(description="Units needed to cover initial investment")
+    monthly_revenue_potential: float = Field(description="Estimated monthly revenue")
+    recommendation: str = Field(description="'GO', 'CAUTION', or 'NO-GO' based on margins")
+
+class FinancialModelingData(BaseModel):
+    target_selling_price: float = Field(description="Recommended price based on market")
+    total_landed_cost: float = Field(description="Product Cost + Estimated Shipping + Customs")
+    marketing_cpa: float = Field(description="Estimated Cost Per Acquisition (Ad spend)")
+    metrics: FinancialMetrics
+    assumptions: List[str] = Field(description="List of assumptions made")
+    
 class AgentState(BaseModel):
     """Shared memory for the system"""
     # INPUT
@@ -133,6 +162,12 @@ class AgentState(BaseModel):
     
     # AGENT -> TrendAnalysisData
     trend_analysis_data: Optional[TrendAnalysisData] = None
+    
+    # AGENT -> SupplierSourcingData
+    supplier_data: Optional[SupplierSourcingData] = None
+    
+    # AGENT -> FinancialModelingData
+    financial_data: Optional[FinancialModelingData] = None
     
     # System Info
     error_message: Optional[Dict[str, str]] = None

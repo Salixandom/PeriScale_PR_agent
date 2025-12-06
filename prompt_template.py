@@ -28,12 +28,12 @@ AVAILABLE AGENTS & CAPABILITIES:
 """
 
 PLANNER_GEN_PROMPT = """
-You are a Senior E-commerce Strategist. 
+You are a Senior E-commerce Strategist.
 Create a logical execution plan to answer the user's request.
 
 CONTEXT:
 User Query: "{user_query}"
-Available Agents: 
+Available Agents:
 {agents_metadata}
 
 HISTORY / FEEDBACK (Fix these issues if present):
@@ -46,7 +46,6 @@ INSTRUCTIONS:
 4. Use 'supplier_sourcing' to find costs.
 5. Use 'financial_modeling' ONLY if you have both Price and Cost data.
 6. Return a JSON structure.
-7. Give worse plan for now so that the critic can find error in your plan. Testing purpose
 """
 
 CRITIC_PROMPT = """
@@ -107,4 +106,16 @@ MARKET_RESEARCHER_SYSTEM_PROMPT = """
 
     Raw Search Data:
     {search_data}
+"""
+
+PAGE_ANALYSIS_PROMPT = """
+You are a Procurement Specialist. I will give you the scraped text (Markdown) from a supplier's product page.
+
+Task: Extract structured data about the product: "{product_name}".
+1. **Price**: Find the unit price. If a range is given ($2.00 - $5.00), use the average.
+2. **MOQ**: Find the Minimum Order Quantity.
+3. **Supplier**: Extract the manufacturer's name.
+
+Scraped Page Content Markdown:
+{markdown_content}
 """
