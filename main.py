@@ -4,6 +4,7 @@ from agents.QueryParser import run_query_parser
 from agents.MarketResearcher import run_market_research
 from agents.TrendAnalysis import run_trend_analysis
 from agents.SupplierSourcing import run_supplier_sourcing
+from llm_gateway import gateway
 
 
 def main():
@@ -69,6 +70,11 @@ def main():
                 for supplier in state.supplier_data.suppliers:
                     print(f"   🔗 {supplier.product_url}")
                     print(f"   💰 Price: {supplier.price_per_unit}")
+
+        print("\n" + "="*80)
+        print("LLM GATEWAY STATISTICS")
+        print("="*80)
+        gateway.print_stats()
     else:
         print("Failed to parse query.")
 

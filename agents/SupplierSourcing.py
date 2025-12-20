@@ -6,16 +6,15 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 from tavily import TavilyClient
 from firecrawl import FirecrawlApp
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from state import AgentState, SupplierSourcingData, SupplierData
 from prompt_template import PAGE_ANALYSIS_PROMPT
+from llm_gateway import gateway 
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
 tavily = TavilyClient()
 firecrawl = FirecrawlApp()
 
@@ -596,15 +595,19 @@ def run_supplier_sourcing(state: AgentState) -> AgentState:
             print(f"      📄 Extracted {len(optimized_content)} chars (from {len(markdown_content)} total)")
             
             # ==========================================
-            # PHASE 3: PARSING (Gemini with Structured Output)
+            # PHASE 3: PARSING (Gateway with Structured Output)
             # ==========================================
             analyze_prompt = ChatPromptTemplate.from_template(PAGE_ANALYSIS_PROMPT)
-            structured_llm = analyze_prompt | llm.with_structured_output(SupplierData)
+            messages = analyze_prompt.format_messages(
+                product_name=product_name,
+                markdown_content=optimized_content
+            )
             
-            supplier_info = structured_llm.invoke({
-                "product_name": product_name,
-                "markdown_content": optimized_content
-            })
+            # Use gateway instead of direct LLM
+            supplier_info = gateway.invoke(
+                messages=messages,
+                structured_output=SupplierData
+            )
             
             # Fill in metadata
             supplier_info.product_url = url
@@ -619,10 +622,15 @@ def run_supplier_sourcing(state: AgentState) -> AgentState:
                 # FALLBACK: Try with last 4000 chars (where pricing usually is)
                 fallback_content = markdown_content[-4000:]
                 
-                supplier_info = structured_llm.invoke({
-                    "product_name": product_name,
-                    "markdown_content": fallback_content
-                })
+                messages = analyze_prompt.format_messages(
+                    product_name=product_name,
+                    markdown_content=fallback_content
+                )
+                
+                supplier_info = gateway.invoke(
+                    messages=messages,
+                    structured_output=SupplierData
+                )
                 supplier_info.product_url = url
                 
                 if supplier_info.price_per_unit and supplier_info.price_per_unit > 0:
@@ -681,7 +689,5 @@ def run_supplier_sourcing(state: AgentState) -> AgentState:
     return state
 
 
-# Optional: Maintenance function to clean old cache
 def cleanup_supplier_cache():
-    """Run periodically to remove stale entries"""
     supplier_cache.clear_stale_entries()
