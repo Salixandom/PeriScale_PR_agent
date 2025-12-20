@@ -68,8 +68,13 @@ def main():
                 print(f"🎯 Recommended Supplier: {state.supplier_data.recommended_supplier.supplier_name}")
                 print(f"🎯 Suppliers: {len(state.supplier_data.suppliers)}")
                 for supplier in state.supplier_data.suppliers:
+                    print(f"   🏦 {supplier.supplier_name}")
+                    print(f"      {supplier.platform}")
                     print(f"   🔗 {supplier.product_url}")
                     print(f"   💰 Price: {supplier.price_per_unit}")
+                    print(f"   📦 MOQ: {supplier.moq}")
+                    print(f"   🌟 Rating: {supplier.rating}")
+                    print(f"   📦 Delivery Time: {supplier.delivery_time_days}")
 
         print("\n" + "="*80)
         print("LLM GATEWAY STATISTICS")
