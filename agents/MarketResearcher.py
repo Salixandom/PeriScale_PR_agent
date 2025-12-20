@@ -3,23 +3,20 @@ import json
 import time
 from tavily import TavilyClient
 from firecrawl import FirecrawlApp
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from state import AgentState, MarketResearchData
 from dotenv import load_dotenv
 
 from prompt_template import MARKET_RESEARCHER_SYSTEM_PROMPT
+from llm_gateway import gateway 
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.1
-)
 tavily = TavilyClient()
 firecrawl = FirecrawlApp()
 
 SCRAPPER = "firecrawl"
+
 
 def run_market_research(state: AgentState) -> AgentState:
     print(f"\n🕵️  AGENT: Starting Market Research...")
@@ -82,7 +79,6 @@ def run_market_research(state: AgentState) -> AgentState:
                 
                 time.sleep(0.5)
             
-            
         except Exception as e:
             print(f"   ❌ Error searching for '{keyword}': {e}")
             continue
@@ -91,16 +87,20 @@ def run_market_research(state: AgentState) -> AgentState:
         print("❌ No results found for any keywords.")
         return state
 
-    print(f"🧠 ANALYZING {len(unique_results)} unique results with Gemini...")
+    print(f"🧠 ANALYZING {len(unique_results)} unique results with Gateway...")
     
     try:
         analyze_prompt = ChatPromptTemplate.from_template(MARKET_RESEARCHER_SYSTEM_PROMPT)
-        structured_llm = analyze_prompt | llm.with_structured_output(MarketResearchData)
-        
-        result = structured_llm.invoke({
-            "product_name": state.parsed_query.product_name or "the product",
-            "search_data": json.dumps(unique_results)
-        })
+
+        messages = analyze_prompt.format_messages(
+            product_name=state.parsed_query.product_name or "the product",
+            search_data=json.dumps(unique_results)
+        )
+
+        result = gateway.invoke(
+            messages=messages,
+            structured_output=MarketResearchData
+        )
         
         state.market_research_data = result
         print(f"✅ SUCCESS: Found {len(result.competitors)} competitors from combined search.")

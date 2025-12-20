@@ -1,16 +1,12 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 
 from state import CritiqueOutput, AgentState
 from prompt_template import CRITIC_PROMPT
+from llm_gateway import gateway 
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.1
-)
 
 def run_critique(state: AgentState) -> AgentState:
     print(f"\n🧐 NODE: Critic")
@@ -20,18 +16,21 @@ def run_critique(state: AgentState) -> AgentState:
         return state
     
     prompt = ChatPromptTemplate.from_template(CRITIC_PROMPT)
-    structured_llm = prompt | llm.with_structured_output(CritiqueOutput)
     
     try:
-        critique = structured_llm.invoke({
-            "plan": state.plan.model_dump_json()
-        })
+        messages = prompt.format_messages(plan=state.plan.model_dump_json())
+        
+        critique = gateway.invoke(
+            messages=messages,
+            structured_output=CritiqueOutput
+        )
         
         if critique.is_approved:
             print("   ✅ Plan Approved by Critic.")
         else:
             print(f"   🛑 Critique: {critique.feedback}")
             state.plan_feedback.append(f"CRITIQUE: {critique.feedback}")
+            
     except Exception as e:
         print(f"   ❌ Critic Error: {e}")
         if not state.error_message:
