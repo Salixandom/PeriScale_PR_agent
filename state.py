@@ -142,6 +142,53 @@ class FinancialModelingData(BaseModel):
     marketing_cpa: float = Field(description="Estimated Cost Per Acquisition (Ad spend)")
     metrics: FinancialMetrics
     assumptions: List[str] = Field(description="List of assumptions made")
+
+class ProductDimensions(BaseModel):
+    """Physical product specifications"""
+    weight_kg: float = Field(description="Weight in kilograms")
+    length_cm: Optional[float] = Field(default=None, description="Length in cm")
+    width_cm: Optional[float] = Field(default=None, description="Width in cm")
+    height_cm: Optional[float] = Field(default=None, description="Height in cm")
+    volumetric_weight_kg: Optional[float] = Field(default=None, description="Calculated volumetric weight")
+
+
+class FreightOption(BaseModel):
+    """Shipping method option"""
+    method: str = Field(description="Air, Sea, Express, ePacket")
+    cost_per_unit: float = Field(description="Shipping cost per unit in USD")
+    transit_days: int = Field(description="Estimated delivery time in days")
+    min_order_quantity: int = Field(default=1, description="Minimum units for this method")
+    recommended: bool = Field(default=False, description="Is this the recommended option")
+    notes: str = Field(description="Additional information")
+
+
+class CustomsDutyInfo(BaseModel):
+    """Customs and import duty information"""
+    hs_code: Optional[str] = Field(default=None, description="Harmonized System code")
+    duty_rate_percentage: float = Field(description="Import duty rate as decimal (0.15 = 15%)")
+    duty_cost_per_unit: float = Field(description="Calculated duty cost per unit")
+    additional_fees: float = Field(default=0.0, description="MPF, HMF, and other fees")
+    total_customs_cost: float = Field(description="Total customs cost per unit")
+    notes: str = Field(description="Explanation of duty calculation")
+
+
+class LogisticsData(BaseModel):
+    """Complete logistics and shipping information"""
+    product_dimensions: ProductDimensions
+    origin_country: str = Field(default="China", description="Manufacturing country")
+    destination_country: str = Field(description="Target market country")
+    
+    freight_options: List[FreightOption] = Field(description="Available shipping methods")
+    recommended_freight: FreightOption = Field(description="Best shipping option")
+    
+    customs_duty: CustomsDutyInfo
+    
+    packaging_cost_per_unit: float = Field(description="Box, bubble wrap, tape, etc.")
+    total_landed_cost_per_unit: float = Field(description="Product cost + Shipping + Customs + Packaging")
+    
+    estimated_delivery_time: str = Field(description="Human-readable delivery estimate")
+    logistics_assumptions: List[str] = Field(description="All assumptions made")
+
     
 class AgentState(BaseModel):
     """Shared memory for the system"""

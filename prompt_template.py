@@ -158,3 +158,26 @@ SCRAPED CONTENT:
 
 Output: Valid SupplierData model
 """
+
+PRODUCT_DIMENSION_EXTRACTOR_SYSTEM_PROMPT = """
+Extract product dimensions from these search results:
+
+PRODUCT: {product}
+SEARCH RESULTS:
+{results}
+
+Extract:
+1. weight_kg: Weight in kilograms (convert from g, oz, lbs if needed)
+2. length_cm: Length in centimeters (if available)
+3. width_cm: Width in centimeters (if available)
+4. height_cm: Height in centimeters (if available)
+
+Conversion examples:
+- 500g → 0.5 kg
+- 12 oz → 0.34 kg
+- 1.5 lbs → 0.68 kg
+- 10 inches → 25.4 cm
+
+If dimensions not found, return weight only with length/width/height as null.
+Be conservative - if uncertain, return lower values.
+"""
